@@ -14,7 +14,7 @@ suppressMessages(lapply(list.of.packages.cran, require, character.only = TRUE))
 # create a list of options to provide from the command line
 option_list = list(
   make_option(c("-c", "--coordinates"), type="character", default=NA,
-              help="input coordinates in the format 'chr:start-stop', multiple coordinates are allowed, space or comma separated and enclosed in quotation marks."),
+              help="path to the text file with input coordinates in the format 'chr:start-stop'"),
   make_option(c("-m", "--method"), type="character", default="loose",
               help="Choose overlapping method, options are: loose (match any region with overlaps >=1 BP), stringent (>50% overlap required), default is loose"
               , metavar="character"),
