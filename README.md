@@ -1,9 +1,10 @@
 # 4DVOUS
 VOUS annotation using 4D Genome data.
-The app takes a text file with genomic coordinates as input and matches them against 4D Genome database in order to find chromatin interactions outside the regions. Also a screening of the ASD database is implemented in order to test associations between mapped genes and autism-associated genes.
+The app takes a text file with genomic coordinates as input (chr:start-end format) and matches them against 4D Genome database in order to find chromatin interactions outside the regions. A screening of the ASD database is also implemented in order to test associations between mapped genes and autism-associated genes.
+
+The app is developed in R with a Python style option parsing from the command line
 
 Usage: VOUS4D.R [options]
-
 
 Options:
 	
