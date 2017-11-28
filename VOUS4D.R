@@ -44,15 +44,18 @@ suppressMessages(lapply(list.of.packages.cran, require, character.only = TRUE))
 #opt$method <- "loose"
 #opt$method <- "stringent"
 #opt$coordinates<-"chr1:31584329-31656511"
+#opt$coordinates <- "dummy.coordinates.txt"
 
 # MATCH BY OVERLAP 
 a <- Sys.time()
 options(scipen = 99)
 if(is.na(opt$coordinates)) {stop("### Please provide at least one input coordinate set, for help: ./VOUSflow --help")}
 
-coords <- as.data.table(matrix(unlist(strsplit(opt$coordinates, ":|-| |,|, ")),ncol = 3, byrow = T)) %>% 
-  set_names(c("input.chr","input.start","input.end")) %>% .[, lapply(.SD, as.numeric), by=input.chr] %>% 
-  setkey(input.chr, input.start, input.end)
+coords <- fread(paste(opt$coordinates), sep = ":", h=F) %>% 
+  .[, c("input.start","input.end") := tstrsplit(V2, "-", fixed = T)] %>%
+  .[, V2 := NULL] %>% setnames("V1", "input.chr") %>% 
+  .[, lapply(.SD, as.numeric), by=input.chr] %>% 
+   setkey(input.chr, input.start, input.end)
 cat("### input coordinates:")
 kable(coords)
 
