@@ -22,9 +22,9 @@ option_list = list(
               help="Path to the VOUS4D.db file, default assumes it is in the same folder"
               , metavar="character"),
   make_option(c("-a", "--asd"), type="logical", default=FALSE,
-              help="Perform match against ASD data? If TRUE an additional file (ASD.outfile.txt) will be produced. [default: %default]"
+              help="Perform match against ASD data? If TRUE an additional file ([outfile].ASD.txt) will be produced. [default: %default]"
               , metavar="character"),
-  make_option(c("-o", "--outfile"), type="character", default="4Dgenome.out.txt",
+  make_option(c("-o", "--outfile"), type="character", default="4DG.out.txt",
               help="Output file name '.txt' and '.xls' format are supported. [default: %default]"
               , metavar="character")
 );
@@ -34,7 +34,7 @@ opt = parse_args(opt_parser);
 
 
 cat("\n### Loading required packages...\n")
-list.of.packages.cran <- c("data.table", "optparse", "plyr", "magrittr", "knitr", "tidyr", "pander", "pkgmaker", "WriteXLS")
+list.of.packages.cran <- c("data.table", "optparse", "plyr", "magrittr", "knitr", "tidyr", "pander", "pkgmaker", "WriteXLS", "tools")
 new.packages <- list.of.packages.cran[!(list.of.packages.cran %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages, repos = "http://cloud.r-project.org/")
 suppressMessages(lapply(list.of.packages.cran, require, character.only = TRUE))
@@ -82,32 +82,26 @@ if(opt$method == "loose"){
     resB <- dat[dat$InteractorBChr==coords[i,1] & coords[i,4] >= dat$InteractorBStart & coords[i,4] <= dat$InteractorBEnd,]
     resC <- dat[dat$InteractorAChr==coords[i,1] & dat$meanA >= coords[i,2] & dat$meanA <= coords[i,3],]
     resD <- dat[dat$InteractorBChr==coords[i,1] & dat$meanB >= coords[i,2] & dat$meanB <= coords[i,3],]
-    res <- rbind(res, rbind(resA,resB, resC, resD))
+    mg <- rbind(resA,resB, resC, resD); if(nrow(mg) == 0) {next}
+    res.temp <- data.frame(coords[i,1:3], mg, row.names = NULL)
+    res <- rbind(res, res.temp)
   }
-} else { 
-  stop("Please, chooose a overlap method between: loose, stringent")
-}
-
-
+} else {stop("Please, chooose a overlap method between: loose, stringent")}
 
 # remove rows with overlaps in both interactors
 res.clean <- res[!(duplicated(res) | duplicated(res, fromLast = TRUE)),]
-if(nrow(res.clean) == 0) {
-  stop("### The input region(s) does not contain any interactions in 4DGenome data")
-}
+if(nrow(res.clean) == 0) {stop("### The input region(s) does not contain any interactions in 4DGenome data")}
 
 cat("\n###", nrow(unique(res)),"interactions found in 4Genome\n") 
-if(opt$method == "loose") {
-  cat("### Method: LOOSE overlap in H1ESC cells and 4 derived cells\n")
-} else {
-  cat("### Method: STRINGENT overlap in H1ESC cells and derived\n")
-}
+if(opt$method == "loose") {cat("### Method: LOOSE overlap in H1ESC cells and 4 derived cells\n")
+} else {cat("### Method: STRINGENT overlap in H1ESC cells and derived\n")}
+
 cat("### Method: removed", nrow(unique(res))-nrow(res.clean),"matches with both interactors overlapping input coordinates\n")
 
 if(file_extension(paste(opt$outfile) %in% c("xls", "xlsx"))){
   WriteXLS(res.clean, ExcelFileName = paste(opt$outfile), BoldHeaderRow = T, na = "NA")
 } else {fwrite(res.clean, file = paste(opt$outfile), sep = "\t")}
-cat("### 4D Genome output file written to:", opt$outfile, "\n")
+
 
 if(opt$asd == TRUE) {
 # make a vector with mapped genes, remove NAs from the vector and genes without a HUGO name (ie, ENSG0xxx)
@@ -135,12 +129,14 @@ asd <- asd[order(asd$`q-value`),]
 pander(head(asd[,c(1:3,8,9,11)],n = 3), split.cell=15, row.names = F)
 
 # write out file
-if(file_extension(paste(opt$outfile) %in% c("xls", "xlsx"))){
-  WriteXLS(asd, ExcelFileName = paste(opt$outfile), BoldHeaderRow = T, na = "NA")
-} else {fwrite(asd, file = paste0("ASD.", paste(opt$outfile)), sep = "\t")}
-cat("### ASD output file written to:", paste0("ASD.", paste(opt$outfile)), "\n")
-cat("### Analysis completed in", Sys.time() - a, "seconds\n\n")
+if(paste(file_extension(paste(opt$outfile)) %in% c("xls", "xlsx"))){
+  WriteXLS(asd, ExcelFileName = paste0(file_path_sans_ext(paste(opt$outfile)),".ASD.xls"), BoldHeaderRow = T, na = "NA")
+  cat("### ASD output file written to:", paste0(file_path_sans_ext(paste(opt$outfile)),".ASD.xls"), "\n")
+  } else {
+  fwrite(asd, file = paste0(paste0(file_path_sans_ext(paste(opt$outfile)),".ASD.txt")), sep = "\t")
+  cat("### ASD output file written to:", paste0(file_path_sans_ext(paste(opt$outfile)),".ASD.txt"), "\n")
+  }
 
-} else {
-  cat("### Analysis completed in", Sys.time() - a, "seconds\n\n")
 }
+cat("### 4D Genome output file written to:", opt$outfile, "\n")
+cat("### Analysis completed in", Sys.time() - a, "seconds\n\n")
