@@ -1,18 +1,12 @@
 # 4DVOUS
-VOUS annotation using 4D Genome data
-
-=======================================================================
-||                                                                   ||
-||  Script developed by: Ferdinando Bonfiglio (nandobonf@gmail.com)  ||
-||                                                                   ||
-=======================================================================
-[[1]]
-[1] TRUE
+VOUS annotation using 4D Genome data.
+The app takes a text file with genomic coordinates as input and matches them against 4D Genome database in order to find chromatin interactions outside the regions. Also a screening of the ASD database is implemented in order to test associations between mapped genes and autism-associated genes.
 
 Usage: VOUS4D.R [options]
 
 
 Options:
+	
 	-c COORDINATES, --coordinates=COORDINATES
 		path to the text file with input coordinates in the format 'chr:start-stop'
 
