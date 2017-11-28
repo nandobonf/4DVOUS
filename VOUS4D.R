@@ -16,13 +16,16 @@ option_list = list(
   make_option(c("-c", "--coordinates"), type="character", default=NA,
               help="path to the text file with input coordinates in the format 'chr:start-stop'"),
   make_option(c("-m", "--method"), type="character", default="loose",
-              help="Choose overlapping method, options are: loose (match any region with overlaps >=1 BP), stringent (>50% overlap required), default is loose"
-              , metavar="character"),
-  make_option(c("-o", "--outfile"), type="character", default="VOUS4D.txt",
-              help="Output file name '.txt' and '.xls' format are supported, default is VOUS4D.out.txt"
+              help="Choose overlapping method, options are: loose (match any region with overlaps >=1 BP), stringent (>50% overlap required). [default: %default]"
               , metavar="character"),
   make_option(c("-d", "--database"), type="character", default="VOUS4D.db",
               help="Path to the VOUS4D.db file, default assumes it is in the same folder"
+              , metavar="character"),
+  make_option(c("-a", "--asd"), type="logical", default=FALSE,
+              help="Perform match against ASD data? If TRUE an additional file (ASD.outfile.txt) will be produced. [default: %default]"
+              , metavar="character"),
+  make_option(c("-o", "--outfile"), type="character", default="4Dgenome.out.txt",
+              help="Output file name '.txt' and '.xls' format are supported. [default: %default]"
               , metavar="character")
 );
 
@@ -38,9 +41,6 @@ suppressMessages(lapply(list.of.packages.cran, require, character.only = TRUE))
 
 # set working directory to the script folder ONLY FOR TESTING
 #setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) # ONLY FOR TESTING
-#opt$coordinates <-c("chr16:100000-110000, chr22:100000-210000, chr1:15000000-15500000")  # ONLY FOR TESTING
-#opt$coordinates <-c("chr16:1000000-1100000") # ONLY FOR TESTING
-#opt$coordinates<-"chr11:116730000-116750000"
 #opt$method <- "loose"
 #opt$method <- "stringent"
 #opt$coordinates<-"chr1:31584329-31656511"
@@ -70,7 +70,7 @@ if(opt$method == "loose"){
     foverlaps(dat, coords, by.x=c('InteractorAChr', 'InteractorAStart', 'InteractorAEnd'), type="any", nomatch = 0L),
     foverlaps(dat, coords, by.x=c('InteractorBChr', 'InteractorBStart', 'InteractorBEnd'), type="any", nomatch = 0L))
     , use.names = T) 
-} else if(opt$method == "stringent") {stop("\n### Stringent method not implemented yet!\n")
+} else if(opt$method == "stringent") {
   coords[,mean:=(input.end+input.start)/2]
   coords <- as.data.frame(coords)
   res = data.table()
@@ -85,8 +85,9 @@ if(opt$method == "loose"){
     res <- rbind(res, rbind(resA,resB, resC, resD))
   }
 } else { 
-  stop("Please chooose a overlap method between: loose, stringent")
+  stop("Please, chooose a overlap method between: loose, stringent")
 }
+
 
 
 # remove rows with overlaps in both interactors
@@ -95,6 +96,20 @@ if(nrow(res.clean) == 0) {
   stop("### The input region(s) does not contain any interactions in 4DGenome data")
 }
 
+cat("\n###", nrow(unique(res)),"interactions found in 4Genome\n") 
+if(opt$method == "loose") {
+  cat("### Method: LOOSE overlap in H1ESC cells and 4 derived cells\n")
+} else {
+  cat("### Method: STRINGENT overlap in H1ESC cells and derived\n")
+}
+cat("### Method: removed", nrow(unique(res))-nrow(res.clean),"matches with both interactors overlapping input coordinates\n")
+
+if(file_extension(paste(opt$outfile) %in% c("xls", "xlsx"))){
+  WriteXLS(res.clean, ExcelFileName = paste(opt$outfile), BoldHeaderRow = T, na = "NA")
+} else {fwrite(res.clean, file = paste(opt$outfile), sep = "\t")}
+cat("### 4D Genome output file written to:", opt$outfile, "\n")
+
+if(opt$asd == TRUE) {
 # make a vector with mapped genes, remove NAs from the vector and genes without a HUGO name (ie, ENSG0xxx)
 mapped.genes <- data.table(gene=c(res.clean$Agene, res.clean$Bgene)
                            , method = c(res.clean$Detection_Method, res.clean$Detection_Method)
@@ -108,13 +123,7 @@ mapped.genes$gene = NULL
 mapped.genes <-ddply(mapped.genes, .(genes), summarize, cells=paste(cell,collapse=", "), methods=paste(method,collapse=", "))
 
 
-cat("\n###", length(unique(mapped.genes$genes)),"unique genes mapped using 4Genome data\n") 
-if(opt$method == "loose") {
-  cat("### Method: LOOSE overlap in H1ESC cells and derived\n")
-} else {
-  cat("### Method: STRINGENT overlap in H1ESC cells and derived\n")
-}
-cat("### Method: removed matches when both interactors overlap input coordinates from", nrow(coords),"input region(s)\n")
+cat("\n###", length(unique(mapped.genes$genes)),"unique genes mapped\n") 
 cat("### Method: removed matches without gene symbol annotation\n")
 #kable(mapped.genes)
 
@@ -128,6 +137,10 @@ pander(head(asd[,c(1:3,8,9,11)],n = 3), split.cell=15, row.names = F)
 # write out file
 if(file_extension(paste(opt$outfile) %in% c("xls", "xlsx"))){
   WriteXLS(asd, ExcelFileName = paste(opt$outfile), BoldHeaderRow = T, na = "NA")
-} else {fwrite(asd, file = paste(opt$outfile), sep = "\t")}
-cat("### Output written to:", opt$outfile, "\n")
+} else {fwrite(asd, file = paste0("ASD.", paste(opt$outfile)), sep = "\t")}
+cat("### ASD output file written to:", paste0("ASD.", paste(opt$outfile)), "\n")
 cat("### Analysis completed in", Sys.time() - a, "seconds\n\n")
+
+} else {
+  cat("### Analysis completed in", Sys.time() - a, "seconds\n\n")
+}
