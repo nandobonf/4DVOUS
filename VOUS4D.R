@@ -69,6 +69,7 @@ if(opt$method == "loose"){
     foverlaps(dat, coords, by.x=c('InteractorAChr', 'InteractorAStart', 'InteractorAEnd'), type="any", nomatch = 0L),
     foverlaps(dat, coords, by.x=c('InteractorBChr', 'InteractorBStart', 'InteractorBEnd'), type="any", nomatch = 0L))
     , use.names = T) 
+  res <- res[,c(1:)]
 } else if(opt$method == "stringent") {
   coords[,mean:=(input.end+input.start)/2]
   coords <- as.data.frame(coords)
@@ -83,7 +84,10 @@ if(opt$method == "loose"){
     resD <- dat[dat$InteractorBChr==coords[i,1] & dat$meanB >= coords[i,2] & dat$meanB <= coords[i,3],]
     mg <- rbind(resA,resB, resC, resD); if(nrow(mg) == 0) {next}
     res.temp <- data.frame(coords[i,1:3], mg, row.names = NULL)
+    res.temp <- res.temp[,c(1:3,5,6,8:13)]
+    colnames(res.temp)[1] <- "Chr"
     res <- rbind(res, res.temp)
+    rm(resA, resB, resC, resD, res.temp)
   }
 } else {stop("Please, chooose a overlap method between: loose, stringent")}
 
