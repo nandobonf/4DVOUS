@@ -26,3 +26,73 @@ Options:
 	-h, --help
 		Show this help message and exit
 
+# An example
+$ Rscript ./VOUS4D.R --coordinates dummy.coordinates.txt --asd TRUE --out test.dummy.txt
+
+=======================================================================
+||                                                                   ||
+||  Script developed by: Ferdinando Bonfiglio (nandobonf@gmail.com)  ||
+||                                                                   ||
+=======================================================================
+
+### Loading required packages... DONE!
+
+### input coordinates:
+
+|input.chr | input.start| input.end|
+|:---------|-----------:|---------:|
+|chr1      |    31584329|  31656511|
+|chr16     |      100000|    110000|
+|chr22     |      100000|    210000|
+
+### Reading 4DGenome and ASD data... DONE!
+
+### 25 interactions found in 4Genome
+### Method: LOOSE overlap in H1ESC and 4 derived cells
+### Method: removed 2 matches with both interactors overlapping input coordinates
+
+### 7 unique genes mapped
+### Method: removed matches without gene symbol annotation
+
+### 7 input genes found in Genome-wide predictions of autism-associated genes (ASD) 
+
+### Top genes (ranked by q-value):
+-------------------------------------------------------------------------------
+  genes         cells            methods        score    probability   q-value 
+--------- ----------------- ----------------- --------- ------------- ---------
+ SERINC2        H1ESC            IM-PET        -0.9271     0.3325      0.01268 
+
+ RHBDF1       H1ESC, H1        5C, IM-PET,     -0.9238     0.3336      0.02095 
+               derived       IM-PET, IM-PET,                                   
+             mesenchymal     IM-PET, IM-PET,                                   
+            stem cell, H1    IM-PET, IM-PET                                    
+               derived                                                         
+             mesendoderm                                                       
+              cell, H1                                                         
+               derived                                                         
+            trophoblast,                                                       
+              H1ESC, H1                                                        
+           derived neural                                                      
+           progenitors, H1                                                     
+               derived                                                         
+           trophoblast, H1                                                     
+               derived                                                         
+             mesenchymal                                                       
+              stem cell                                                        
+
+ POLR3K      H1 derived      IM-PET, IM-PET,   -0.9428     0.3297      0.1103  
+             mesenchymal     IM-PET, IM-PET                                    
+            stem cell, H1                                                      
+               derived                                                         
+           trophoblast, H1                                                     
+               derived                                                         
+             mesendoderm                                                       
+             cell, H1ESC                                                       
+-------------------------------------------------------------------------------
+
+### ASD output file written to: test.dummy.ASD.txt 
+
+### 4D Genome output file written to: test.dummy.txt 
+### Analysis completed in 5.09094 seconds
+
+
