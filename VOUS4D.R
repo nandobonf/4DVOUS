@@ -69,7 +69,8 @@ if(opt$method == "loose"){
     foverlaps(dat, coords, by.x=c('InteractorAChr', 'InteractorAStart', 'InteractorAEnd'), type="any", nomatch = 0L),
     foverlaps(dat, coords, by.x=c('InteractorBChr', 'InteractorBStart', 'InteractorBEnd'), type="any", nomatch = 0L))
     , use.names = T) 
-  res <- res[,c(1:)]
+  res <- res[,c(1:5,7:12)]
+  colnames(res)[1] <- "Chr"
 } else if(opt$method == "stringent") {
   coords[,mean:=(input.end+input.start)/2]
   coords <- as.data.frame(coords)
