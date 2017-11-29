@@ -13,7 +13,7 @@ invisible(suppressWarnings(suppressMessages(lapply(list.of.packages.cran, requir
 # create a list of options to provide from the command line
 option_list = list(
   make_option(c("-c", "--coordinates"), type="character", default=NA,
-              help="path to the text file with input coordinates in the format 'chr:start-stop'"),
+              help="Path to the text file with input coordinates in the format 'chr:start-stop'"),
   make_option(c("-m", "--method"), type="character", default="loose",
               help="Choose overlapping method, options are: loose (match any region with overlaps >=1 BP), stringent (>50% overlap required). [default: %default]"
               , metavar="character"),
@@ -69,15 +69,15 @@ if(opt$method == "loose"){
     foverlaps(dat, coords, by.x=c('InteractorAChr', 'InteractorAStart', 'InteractorAEnd'), type="any", nomatch = 0L),
     foverlaps(dat, coords, by.x=c('InteractorBChr', 'InteractorBStart', 'InteractorBEnd'), type="any", nomatch = 0L))
     , use.names = T) 
-  res <- res[,c(1:5,7:12)]
-  colnames(res)[1] <- "Chr"
+  res <- merge(coords, res, by =c("input.start", "input.end"), sort = F)
+  res <- res[,c(3,1,2,4:13)]
 } else if(opt$method == "stringent") {
   coords[,mean:=(input.end+input.start)/2]
   coords <- as.data.frame(coords)
-  res = data.table()
   dat <- as.data.frame(dat)
   dat$meanA <- (dat$InteractorAStart+dat$InteractorAEnd)/2
   dat$meanB <- (dat$InteractorBStart+dat$InteractorBEnd)/2
+  res = data.table()
   for(i in 1:nrow(coords)) {
     resA <- dat[dat$InteractorAChr==coords[i,1] & coords[i,4] >= dat$InteractorAStart & coords[i,4] <= dat$InteractorAEnd,]
     resB <- dat[dat$InteractorBChr==coords[i,1] & coords[i,4] >= dat$InteractorBStart & coords[i,4] <= dat$InteractorBEnd,]
@@ -85,8 +85,7 @@ if(opt$method == "loose"){
     resD <- dat[dat$InteractorBChr==coords[i,1] & dat$meanB >= coords[i,2] & dat$meanB <= coords[i,3],]
     mg <- rbind(resA,resB, resC, resD); if(nrow(mg) == 0) {next}
     res.temp <- data.frame(coords[i,1:3], mg, row.names = NULL)
-    res.temp <- res.temp[,c(1:3,5,6,8:13)]
-    colnames(res.temp)[1] <- "Chr"
+    res.temp <- res.temp[,c(1:13)]
     res <- rbind(res, res.temp)
     rm(resA, resB, resC, resD, res.temp)
   }
@@ -105,7 +104,6 @@ cat("### Method: removed", nrow(unique(res))-nrow(res.clean),"matches with both 
 if(file_extension(paste(opt$outfile) %in% c("xls", "xlsx"))){
   WriteXLS(res.clean, ExcelFileName = paste(opt$outfile), BoldHeaderRow = T, na = "NA")
 } else {fwrite(res.clean, file = paste(opt$outfile), sep = "\t")}
-
 
 if(opt$asd == TRUE) {
 # make a vector with mapped genes, remove NAs from the vector and genes without a HUGO name (ie, ENSG0xxx)
