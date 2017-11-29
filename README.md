@@ -29,7 +29,6 @@ Options:
 ## An example
 ```{shell}
 $ Rscript ./VOUS4D.R --coordinates dummy.coordinates.txt --asd TRUE --out test.dummy.txt
-MacBookNando:vous4d febo$ Rscript ./VOUS4D.R --coordinates dummy.coordinates.txt --asd TRUE --out test.dummy.txt
 
 =======================================================================
 ||                                                                   ||
