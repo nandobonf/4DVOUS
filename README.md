@@ -27,6 +27,7 @@ Options:
 		Show this help message and exit
 
 # An example
+```{shell}
 $ Rscript ./VOUS4D.R --coordinates dummy.coordinates.txt --asd TRUE --out test.dummy.txt
 
 =======================================================================
@@ -35,9 +36,9 @@ $ Rscript ./VOUS4D.R --coordinates dummy.coordinates.txt --asd TRUE --out test.d
 ||                                                                   ||
 =======================================================================
 
-### Loading required packages... DONE!
+Loading required packages... DONE!
 
-### input coordinates:
+input coordinates:
 
 |input.chr | input.start| input.end|
 |:---------|-----------:|---------:|
@@ -45,18 +46,18 @@ $ Rscript ./VOUS4D.R --coordinates dummy.coordinates.txt --asd TRUE --out test.d
 |chr16     |      100000|    110000|
 |chr22     |      100000|    210000|
 
-### Reading 4DGenome and ASD data... DONE!
+Reading 4DGenome and ASD data... DONE!
 
-### 25 interactions found in 4Genome
-### Method: LOOSE overlap in H1ESC and 4 derived cells
-### Method: removed 2 matches with both interactors overlapping input coordinates
+##25 interactions found in 4Genome
+###ethod: LOOSE overlap in H1ESC and 4 derived cells
+###Method: removed 2 matches with both interactors overlapping input coordinates
 
-### 7 unique genes mapped
-### Method: removed matches without gene symbol annotation
+###7 unique genes mapped
+###Method: removed matches without gene symbol annotation
 
-### 7 input genes found in Genome-wide predictions of autism-associated genes (ASD) 
+###7 input genes found in Genome-wide predictions of autism-associated genes (ASD) 
 
-### Top genes (ranked by q-value):
+###Top genes (ranked by q-value):
 -------------------------------------------------------------------------------
   genes         cells            methods        score    probability   q-value 
 --------- ----------------- ----------------- --------- ------------- ---------
@@ -90,9 +91,8 @@ $ Rscript ./VOUS4D.R --coordinates dummy.coordinates.txt --asd TRUE --out test.d
              cell, H1ESC                                                       
 -------------------------------------------------------------------------------
 
-### ASD output file written to: test.dummy.ASD.txt 
+###ASD output file written to: test.dummy.ASD.txt 
 
-### 4D Genome output file written to: test.dummy.txt 
-### Analysis completed in 5.09094 seconds
-
-
+###4D Genome output file written to: test.dummy.txt 
+###Analysis completed in 5.09094 seconds
+```
