@@ -5,11 +5,10 @@ cat("||  Script developed by: Ferdinando Bonfiglio (nandobonf@gmail.com)  ||\n")
 cat("||                                                                   ||\n")
 cat("=======================================================================\n")
 
-options(warn=-1)
 list.of.packages.cran <- c("optparse")
 new.packages <- list.of.packages.cran[!(list.of.packages.cran %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages, repos = "http://cloud.r-project.org/")
-suppressMessages(lapply(list.of.packages.cran, require, character.only = TRUE))
+invisible(suppressWarnings(suppressMessages(lapply(list.of.packages.cran, require, character.only = TRUE))))
 
 # create a list of options to provide from the command line
 option_list = list(
@@ -33,12 +32,12 @@ opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 
 
-cat("\n### Loading required packages...\n")
+cat("\n### Loading required packages...")
 list.of.packages.cran <- c("data.table", "optparse", "plyr", "magrittr", "knitr", "tidyr", "pander", "pkgmaker", "WriteXLS", "tools")
 new.packages <- list.of.packages.cran[!(list.of.packages.cran %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages, repos = "http://cloud.r-project.org/")
-suppressMessages(lapply(list.of.packages.cran, require, character.only = TRUE))
-
+invisible(suppressMessages(suppressWarnings(lapply(list.of.packages.cran, require, character.only = TRUE))))
+cat(" DONE!\n")
 # set working directory to the script folder ONLY FOR TESTING
 #setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) # ONLY FOR TESTING
 #opt$method <- "loose"
@@ -56,12 +55,12 @@ coords <- fread(paste(opt$coordinates), sep = ":", h=F) %>%
   .[, V2 := NULL] %>% setnames("V1", "input.chr") %>% 
   .[, lapply(.SD, as.numeric), by=input.chr] %>% 
    setkey(input.chr, input.start, input.end)
-cat("### input coordinates:")
+cat("\n### input coordinates:")
 kable(coords)
 
-cat("\n### Reading 4DGenome and ASD data ...")
+if(opt$asd == T) {cat("\n### Reading 4DGenome and ASD data...")} else {cat("\n### Reading 4DGenome data...")}
 load(paste(opt$database))
-cat("DONE\n")
+cat(" DONE!\n")
 cells <- c("H1ESC", "H1 derived mesenchymal stem cell", "H1 derived mesendoderm cell", "H1 derived neural progenitors", "H1 derived trophoblast")
 dat <- dat %>% subset(`Cell/Tissue` %in% cells)
 
@@ -93,8 +92,8 @@ res.clean <- res[!(duplicated(res) | duplicated(res, fromLast = TRUE)),]
 if(nrow(res.clean) == 0) {stop("### The input region(s) does not contain any interactions in 4DGenome data")}
 
 cat("\n###", nrow(unique(res)),"interactions found in 4Genome\n") 
-if(opt$method == "loose") {cat("### Method: LOOSE overlap in H1ESC cells and 4 derived cells\n")
-} else {cat("### Method: STRINGENT overlap in H1ESC cells and derived\n")}
+if(opt$method == "loose") {cat("### Method: LOOSE overlap in H1ESC and 4 derived cells\n")
+} else {cat("### Method: STRINGENT overlap in H1ESC and 4 derived cells\n")}
 
 cat("### Method: removed", nrow(unique(res))-nrow(res.clean),"matches with both interactors overlapping input coordinates\n")
 
@@ -138,5 +137,5 @@ if(paste(file_extension(paste(opt$outfile)) %in% c("xls", "xlsx"))){
   }
 
 }
-cat("### 4D Genome output file written to:", opt$outfile, "\n")
+cat("\n### 4D Genome output file written to:", opt$outfile, "\n")
 cat("### Analysis completed in", Sys.time() - a, "seconds\n\n")
