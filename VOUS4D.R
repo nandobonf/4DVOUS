@@ -62,7 +62,7 @@ if(opt$asd == T) {cat("\n### Reading 4DGenome and ASD data...")} else {cat("\n##
 load(paste(opt$database))
 cat(" DONE!\n")
 cells <- c("H1ESC", "H1 derived mesenchymal stem cell", "H1 derived mesendoderm cell", "H1 derived neural progenitors", "H1 derived trophoblast")
-dat <- dat %>% subset(`Cell/Tissue` %in% cells)
+dat <- dat %>% subset(`Cell/Tissue` %in% cells) %>% setnames("Cell/Tissue", "Cell_Tissue")
 
 if(opt$method == "loose"){
   res <- rbindlist(list(
