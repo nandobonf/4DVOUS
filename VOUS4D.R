@@ -102,7 +102,7 @@ if(opt$method == "loose") {cat("### Method: LOOSE overlap in H1ESC and 4 derived
 cat("### Method: removed", nrow(unique(res))-nrow(res.clean),"matches with both interactors overlapping input coordinates\n")
 
 if(file_extension(paste(opt$outfile) %in% c("xls", "xlsx"))){
-  WriteXLS(res.clean, ExcelFileName = paste(opt$outfile), BoldHeaderRow = T, na = "NA")
+  WriteXLS(res.clean, ExcelFileName = paste(opt$outfile), BoldHeaderRow = T)
 } else {fwrite(res.clean, file = paste(opt$outfile), sep = "\t")}
 
 if(opt$asd == TRUE) {
