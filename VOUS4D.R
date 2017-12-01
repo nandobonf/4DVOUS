@@ -1,9 +1,9 @@
 #!/usr/bin/env Rscript
-cat("\n=======================================================================\n")
-cat("||                                                                   ||\n")
-cat("||  Script developed by: Ferdinando Bonfiglio (nandobonf@gmail.com)  ||\n")
-cat("||                                                                   ||\n")
-cat("=======================================================================\n")
+cat("\n======================================================================\n")
+cat("||                                                                  ||\n")
+cat("||  Script developed by Ferdinando Bonfiglio (nandobonf@gmail.com)  ||\n")
+cat("||                                                                  ||\n")
+cat("======================================================================\n")
 
 list.of.packages.cran <- c("optparse")
 new.packages <- list.of.packages.cran[!(list.of.packages.cran %in% installed.packages()[,"Package"])]
@@ -48,7 +48,7 @@ cat(" DONE!\n")
 # MATCH BY OVERLAP 
 a <- Sys.time()
 options(scipen = 99)
-if(is.na(opt$coordinates)) {stop("### Please provide at least one input coordinate set, for help: ./VOUSflow --help")}
+if(is.na(opt$coordinates)) {stop("### Please provide input file with coordinates, for help: ./VOUS4D.R --help")}
 
 coords <- fread(paste(opt$coordinates), sep = ":", h=F) %>% 
   .[, c("input.start","input.end") := tstrsplit(V2, "-", fixed = T)] %>%
