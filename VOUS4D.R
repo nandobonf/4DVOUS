@@ -109,7 +109,7 @@ if(opt$asd == TRUE) {
 # make a vector with mapped genes, remove NAs from the vector and genes without a HUGO name (ie, ENSG0xxx)
 mapped.genes <- data.table(gene=c(res.clean$Agene, res.clean$Bgene)
                            , method = c(res.clean$Detection_Method, res.clean$Detection_Method)
-                           , cell = c(res.clean$`Cell/Tissue`, res.clean$`Cell/Tissue`)
+                           , cell = c(res.clean$`Cell_Tissue`, res.clean$`Cell_Tissue`)
 ) %>% unique() %>% .[!is.na(gene)] %>%
   mutate(genes = strsplit(as.character(gene), ",")) %>% 
   unnest(genes) 
